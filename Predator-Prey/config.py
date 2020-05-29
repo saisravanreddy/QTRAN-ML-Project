@@ -10,7 +10,7 @@ import agents.config_agents as config_agent
 flags = tf.flags
 
 flags.DEFINE_integer("seed", 0, "Random seed number")
-flags.DEFINE_string("folder", "default", "Result file folder name")
+flags.DEFINE_string("folder", "sravan-run", "Result file folder name")
 flags.DEFINE_string("comment", "None",
                     "Additional Comments")
 flags.DEFINE_boolean("gui", False, "Activate GUI")

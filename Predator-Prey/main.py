@@ -33,10 +33,19 @@ if __name__ == '__main__':
     logger_env = logging.getLogger('GridMARL')
     logger_agent = logging.getLogger('Agent')
 
+    '''
     # === Program start === #
     # Load environment
     env = make_env.make_env(FLAGS.scenario)
     logger_env.info('GridMARL Start with %d predator(s) and %d prey(s)', FLAGS.n_predator, FLAGS.n_prey)
+    '''
+
+    #parallel environments
+    env = []
+    for _ in range(FLAGS.parallel_episodes):
+        env.append(make_env.make_env(FLAGS.scenario))
+    logger_env.info('GridMARL Start with %d predator(s) and %d prey(s)', FLAGS.n_predator, FLAGS.n_prey)
+    #parallel environments end
 
     # Load trainer
     logger_agent.info('Agent: {}'.format(FLAGS.agent))
@@ -47,9 +56,10 @@ if __name__ == '__main__':
     # start learning
     if FLAGS.train:
         start_time = time.time()
-        trainer.learn()
+        trainer.learn_parallel()
         finish_time = time.time()
         # trainer.test()
         print "TRAINING TIME (sec)", finish_time - start_time
     else:
         trainer.test()
+

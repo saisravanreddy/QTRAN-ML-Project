@@ -8,20 +8,21 @@ def config_env(_flags):
     
 
     # Scenario
-    flags.DEFINE_string("scenario", "pursuit", "Scenario")
+    flags.DEFINE_string("scenario", "endless3", "Scenario")
     flags.DEFINE_integer("n_predator", 2, "Number of predators")
-    flags.DEFINE_integer("n_prey1", 1, "Number of preys 1")
+    flags.DEFINE_integer("n_prey1", 0, "Number of preys 1")
     flags.DEFINE_integer("n_prey2", 1, "Number of preys 2")
-    flags.DEFINE_integer("n_prey", 2, "Number of preys")
+    flags.DEFINE_integer("n_prey", 1, "Number of preys")
     # Observation
     flags.DEFINE_integer("history_len", 1, "How many previous steps we look back")
 
     # core
-    flags.DEFINE_integer("map_size", 3, "Size of the map")
+    flags.DEFINE_integer("map_size", 5, "Size of the map")
+    flags.DEFINE_integer("parallel_episodes",100,"Number of episodes to be parallely run")
     flags.DEFINE_float("render_every", 1000, "Render the nth episode")
 
     # Penalty
-    flags.DEFINE_integer("penalty", 1, "reward penalty")
+    flags.DEFINE_integer("penalty", 5 , "reward penalty")
 
 def get_filename():
     import config

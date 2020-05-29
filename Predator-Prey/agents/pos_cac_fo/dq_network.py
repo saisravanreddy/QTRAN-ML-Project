@@ -5,6 +5,7 @@ import random
 import config
 import os
 from agents.evaluation import Evaluation
+import time
 
 FLAGS = config.flags.FLAGS
 
@@ -57,6 +58,7 @@ class DQNetwork(object):
         # indicators (go into target computation)
         self.is_training_ph = tf.placeholder(dtype=tf.bool, shape=())  # for dropout
 
+        #q_network is Q(jt) network , Inputs: state,action gives the Q(jt) factor
         with tf.variable_scope('q_network'):
             if FLAGS.algorithm == "vdn":
                 self.q_network, self.actor_network, self.v, self.qp  = self.generate_VDN(self.s_in, self.a_in, True)
@@ -95,10 +97,12 @@ class DQNetwork(object):
                 with tf.device('/cpu:0'): 
                     self.cpu_q_network, self.cpu_actor_network, self.cpu_v, self.cpu_qp  = self.generate_PQMIX6(self.s_in, self.a_in, True)
             elif FLAGS.algorithm == "pqmix7": #QTRAN-base
-                self.q_network, self.actor_network, self.v, self.p, self.qp  = self.generate_PQMIX7(self.s_in, self.a_in, True)
-                with tf.device('/cpu:0'): 
-                    self.cpu_q_network, self.cpu_actor_network, self.cpu_v, self.cpu_p, self.cpu_qp  = self.generate_PQMIX7(self.s_in, self.a_in, True)
+                with tf.device('/gpu:0'):
+                    self.q_network, self.actor_network, self.v, self.p, self.qp  = self.generate_PQMIX7(self.s_in, self.a_in, True)
+                #with tf.device('/gpu:0'):
+                #    self.cpu_q_network, self.cpu_actor_network, self.cpu_v, self.cpu_p, self.cpu_qp  = self.generate_PQMIX7(self.s_in, self.a_in, True)
 
+        #target_q_network is Q'(jt) network, Inputs:state,action output: Q'(jt) factor
         with tf.variable_scope('target_q_network'):
             if FLAGS.algorithm == "vdn":
                 self.target_q_network, self.target_actor_network, self.tv, self.tqp = self.generate_VDN(self.s_in, self.a_in, False)
@@ -137,12 +141,16 @@ class DQNetwork(object):
                 with tf.device('/cpu:0'): 
                     self.cpu_target_q_network, self.cpu_target_actor_network, self.cpu_tv, self.cpu_tqp = self.generate_PQMIX6(self.s_in, self.a_in, False)
             elif FLAGS.algorithm == "pqmix7":
-                self.target_q_network, self.target_actor_network, self.tv, self.tp, self.tqp = self.generate_PQMIX7(self.s_in, self.a_in, False)
-                with tf.device('/cpu:0'): 
-                    self.cpu_target_q_network, self.cpu_target_actor_network, self.cpu_tv, self.cpu_tp, self.cpu_tqp = self.generate_PQMIX7(self.s_in, self.a_in, False)
+                with tf.device('/gpu:0'):
+                    self.target_q_network, self.target_actor_network, self.tv, self.tp, self.tqp = self.generate_PQMIX7(self.s_in, self.a_in, False)
+                #with tf.device('/gpu:0'):
+                #    self.cpu_target_q_network, self.cpu_target_actor_network, self.cpu_tv, self.cpu_tp, self.cpu_tqp = self.generate_PQMIX7(self.s_in, self.a_in, False)
         
         self.action_onehot = tf.one_hot(self.actor_network, self.action_dim_single, on_value=1.0, off_value=0.0, axis=-1)
         self.target_action_onehot = tf.one_hot(self.target_actor_network, self.action_dim_single, on_value=1.0, off_value=0.0, axis=-1)
+
+        #optimization network is the adamomptimizer based loss minimizing network L()
+        #Inputs: y_in(y(dqn)),q_network(Q(jt)) to calculate L(td),self.p= penalty1(L(opt))+penalty2(L(nopt))
         with tf.variable_scope('optimization'):
             
             self.delta = self.y_in - self.q_network
@@ -157,10 +165,10 @@ class DQNetwork(object):
             self.merged = tf.summary.merge_all()
 
             if FLAGS.algorithm == "pqmix3" or FLAGS.algorithm == "pqmix4" or FLAGS.algorithm == "pqmix5" or FLAGS.algorithm == "pqmix7":
-                
+
                 self.clipped_error = tf.square(self.delta)
 
-                self.cost1 = tf.reduce_mean(self.clipped_error)      
+                self.cost1 = tf.reduce_mean(self.clipped_error)
                 self.clipped_p = tf.abs(self.p)
                 self.cost2 = tf.reduce_mean(self.clipped_p)
                 self.cost = 1 * self.cost1 + (self.beta_in) * self.cost2 # pqmix, 1, 0.01 0.001
@@ -179,7 +187,9 @@ class DQNetwork(object):
                 self.cost =  self.cost1 +  self.cost2
 
 
-            self.train_network = tf.train.AdamOptimizer(learning_rate, epsilon = 1.5e-4).minimize(self.cost)
+
+            with tf.device('/gpu:0'):
+                self.train_network = tf.train.AdamOptimizer(learning_rate, epsilon = 1.5e-4).minimize(self.cost)
 
         o_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_network')
         t_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='target_q_network')
@@ -1251,6 +1261,7 @@ class DQNetwork(object):
         q_value = p_network
         value = mp_network
 
+        #penalty1 is L(opt), penalty2 is L(nopt)
         penalty1 = tf.stop_gradient(value) - tf.reduce_sum(qmax_values, reduction_indices=1, keep_dims = True)
         penalty2 = tf.stop_gradient(q_value) - tf.reduce_sum(q_values, reduction_indices=1, keep_dims = True)
             
@@ -1271,38 +1282,55 @@ class DQNetwork(object):
         return q_value, optimal_action, value, error, error
     
     def get_action(self, state_ph):
-        return self.sess.run(self.cpu_actor_network, feed_dict={self.s_in: state_ph})
+        #return self.sess.run(self.cpu_actor_network, feed_dict={self.s_in: state_ph})
+        #sravan
+        return self.sess.run(self.actor_network, feed_dict={self.s_in: state_ph})
 
+    '''
     def get_q_values(self, state_ph, action_ph):
         if FLAGS.algorithm == "pqmix":
-            target_penalty = self.sess.run(self.cpu_tp, feed_dict={self.s_in: state_ph})
-            return self.sess.run(self.cpu_q_network, feed_dict={self.s_in: state_ph,
-                                                        self.a_in: action_ph, self.p_in: target_penalty})
-
+            #target_penalty = self.sess.run(self.cpu_tp, feed_dict={self.s_in: state_ph})
+            target_penalty = self.sess.run(self.tp, feed_dict={self.s_in: state_ph})
+            #return self.sess.run(self.cpu_q_network, feed_dict={self.s_in: state_ph,
+            #                                            self.a_in: action_ph, self.p_in: target_penalty})
+            #sravan
+            return self.sess.run(self.q_network, feed_dict={self.s_in: state_ph,
+                                                                self.a_in: action_ph, self.p_in: target_penalty})
         else:
-            return self.sess.run(self.cpu_q_network, feed_dict={self.s_in: state_ph,
-                                                        self.a_in: action_ph})
-
+            #return self.sess.run(self.cpu_q_network, feed_dict={self.s_in: state_ph,
+            #                                            self.a_in: action_ph})
+            return self.sess.run(self.q_network, feed_dict={self.s_in: state_ph,
+                                                                self.a_in: action_ph})
+    '''
+    '''
     def get_qp_values(self, state_ph, action_ph):
         if FLAGS.algorithm == "pqmix":
             target_penalty = self.sess.run(self.cpu_tp, feed_dict={self.s_in: state_ph})
-            return self.sess.run(self.cpu_qp, feed_dict={self.s_in: state_ph,
-                                                        self.a_in: action_ph, self.p_in: target_penalty})
-
+            #return self.sess.run(self.cpu_qp, feed_dict={self.s_in: state_ph,
+            #                                            self.a_in: action_ph, self.p_in: target_penalty})
+            #sravan
+            return self.sess.run(self.qp, feed_dict={self.s_in: state_ph,
+                                                         self.a_in: action_ph, self.p_in: target_penalty})
         else:
-            return self.sess.run(self.cpu_qp, feed_dict={self.s_in: state_ph,
-                                                        self.a_in: action_ph})
-
+            #return self.sess.run(self.cpu_qp, feed_dict={self.s_in: state_ph,
+            #                                            self.a_in: action_ph})
+            #sravan
+            return self.sess.run(self.qp, feed_dict={self.s_in: state_ph,
+                                                         self.a_in: action_ph})
+    '''
+    '''
     def get_target_q_values(self, state_ph, action_ph):
         return self.sess.run(self.target_q_network, feed_dict={self.s_in: state_ph,
                                                                self.a_in: action_ph})
-
+    '''
     def training_qnet(self, minibatch):
+        # train the network using total loss of adamoptimizer network q_train_network
         y = []
         self.cnt += 1
 
-
+        target_qvalues_time = time.clock()
         # Get target value from target network
+        # Get target_q_values for the minibatch
         if FLAGS.algorithm == "pqmix":
             # target_action, stp = self.sess.run([self.target_action_onehot,self.tp], feed_dict={self.s_in: [data[3] for data in minibatch]})
             stp = self.sess.run(self.tp, feed_dict={self.s_in: [data[3] for data in minibatch]})
@@ -1323,9 +1351,11 @@ class DQNetwork(object):
         done = np.array([[data[4]] for data in minibatch])
         y = r + gamma * (1-done) * target_q_values
 
+        #print "target_q_values time ", target_qvalues_time, "total time", time.clock() - target_qvalues_time
 
 
 
+        train_network_sess_time =time.clock()
         if FLAGS.algorithm == "pqmix":
             c,c2, _= self.sess.run([self.cost, self.meanq, self.train_network], feed_dict={
                     self.y_in: y,
@@ -1388,7 +1418,9 @@ class DQNetwork(object):
             if self.cnt % 10000 == 0 and self.cnt >= 10000:
                 print "Penalty: ", FLAGS.penalty, "meanQ: ", self.cnt, self.TDerror2/10000, '%.3f' % self.beta
                 self.TDerror2 = 0
-        
+        #print "train_network sess start time ", train_network_sess_time, "total time", time.clock() - train_network_sess_time
+
+
 
             
     def training_target_qnet(self):

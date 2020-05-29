@@ -18,6 +18,7 @@ from agents.pos_cac_fo.dq_network import *
 from agents.pos_cac_fo.replay_buffer import *
 from agents.evaluation import Evaluation
 
+import time
 import logging
 import config
 
@@ -45,7 +46,7 @@ class Agent(object):
 
         self._name = name
         self.update_cnt = 0
-        self.target_update_period = 10000
+        self.target_update_period = 100
 
         self.df = FLAGS.df
         self.lr = FLAGS.lr
@@ -55,8 +56,10 @@ class Agent(object):
         my_graph = tf.Graph()
 
         with my_graph.as_default():
-            self.sess = tf.Session(graph=my_graph, config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
-            self.q_network = DQNetwork(self.sess, self._state_dim, self._action_dim_single, self._n_predator) 
+            self.sess = tf.Session(graph=my_graph, config=tf.ConfigProto(log_device_placement=True,gpu_options=tf.GPUOptions(allow_growth=True)))
+            #with tf.device('/gpu:0'):
+            self.q_network = DQNetwork(self.sess, self._state_dim, self._action_dim_single, self._n_predator)
+            self.writer = tf.summary.FileWriter("QTRAN_graph", self.sess.graph)
             self.sess.run(tf.global_variables_initializer())
             self.saver = tf.train.Saver()
             if FLAGS.load_nn:
@@ -94,9 +97,17 @@ class Agent(object):
         s_n = self.state_to_index(state_n)
         r = np.sum(reward)
 
+        #storing sample of actions(both predator and prey) at each timestep
+        store_sample_time = time.clock()
         self.store_sample(s, a, r, s_n, done)
+        #print "store_sample start time ", store_sample_time, "total time", time.clock() - store_sample_time
 
+        '''
+        #instead of training network once per each step,train them once per episode with larger batch size
+        update_network_time = time.clock()
         self.update_network()
+        print "update_network start time ", update_network_time, "total time", time.clock() - update_network_time
+        '''
         return 0
 
     def store_sample(self, s, a, r, s_n, done):
@@ -105,12 +116,14 @@ class Agent(object):
 
     def update_network(self):
         self.update_cnt += 1
+        #donot update q network from replay buffer if replay buffer size is less
         if len(self.replay_buffer.replay_memory) < FLAGS.pre_train_step*minibatch_size:
             return 0
 
         minibatch = self.replay_buffer.sample_from_memory()
+        training_qnet_time = time.clock()
         self.q_network.training_qnet(minibatch)
-
+        #print "q_network training time ", training_qnet_time, "total time", time.clock() - training_qnet_time
 
         if self.update_cnt % self.target_update_period == 0:
             self.q_network.training_target_qnet()
