@@ -10,8 +10,6 @@ import tensorflow as tf
 import numpy as np
 
 
-print "hello world"
-
 FLAGS = config.flags.FLAGS
 
 def set_seed(seed):
@@ -40,12 +38,14 @@ if __name__ == '__main__':
     logger_env.info('GridMARL Start with %d predator(s) and %d prey(s)', FLAGS.n_predator, FLAGS.n_prey)
     '''
 
+
     #parallel environments
     env = []
     for _ in range(FLAGS.parallel_episodes):
         env.append(make_env.make_env(FLAGS.scenario))
     logger_env.info('GridMARL Start with %d predator(s) and %d prey(s)', FLAGS.n_predator, FLAGS.n_prey)
     #parallel environments end
+
 
     # Load trainer
     logger_agent.info('Agent: {}'.format(FLAGS.agent))
@@ -57,6 +57,7 @@ if __name__ == '__main__':
     if FLAGS.train:
         start_time = time.time()
         trainer.learn_parallel()
+        #trainer.learn()
         finish_time = time.time()
         # trainer.test()
         print "TRAINING TIME (sec)", finish_time - start_time

@@ -64,7 +64,8 @@ class Agent(object):
             self.saver = tf.train.Saver()
             if FLAGS.load_nn:
                 print "LOAD!"
-                self.saver.restore(self.sess, "./results/nn3/n-"+str(FLAGS.n_predator)+"-s-endless3-map-"+str(FLAGS.map_size)+"-penalty-"+str(FLAGS.penalty)+"-a-"+str(FLAGS.algorithm)+"-lr-0.0005-ms-32-seed-"+str(FLAGS.seed)+"-"+str(FLAGS.comment))
+                #self.saver.restore(self.sess, "./results/nn3/n-"+str(FLAGS.n_predator)+"-s-endless3-map-"+str(FLAGS.map_size)+"-penalty-"+str(FLAGS.penalty)+"-a-"+str(FLAGS.algorithm)+"-lr-0.0005-ms-32-seed-"+str(FLAGS.seed)+"-"+str(FLAGS.comment))
+                self.saver.restore(self.sess,"results/nn/sravan-run/n-2-s-endless3-map-5-penalty-5-a-pqmix7-lr-0.0001-ms-64-seed-0-0528235900-None-10000")
             self.train_writer = tf.summary.FileWriter(config.tb_filename, self.sess.graph)
 
         self.replay_buffer = ReplayBuffer()

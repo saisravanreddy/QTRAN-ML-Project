@@ -68,7 +68,6 @@ class Trainer(object):
         count = 1
         while step < training_step:
             # parallelizing episodes start
-            start_time = time.clock()
 
             total_reward = np.zeros(FLAGS.parallel_episodes)
             total_reward_pos = np.zeros(FLAGS.parallel_episodes)
@@ -90,6 +89,11 @@ class Trainer(object):
                 episode += 1
                 parallel_episode_no += 1
 
+            start_time = time.clock()
+            env_parallel_step_time =0
+            get_action_time=0
+            train_func_call_time = 0
+            update_network_time = 0
 
             while ep_step <= FLAGS.max_step:
                 #print "episode_start" , episode_start, "ep_step", ep_step
@@ -99,7 +103,10 @@ class Trainer(object):
                 #self._env[parallel_episode_no-1].render()
 
                 #print "getting action"
+                get_action_start_time = time.clock()
                 action_parallel = self.get_action_parallel(obs_parallel, step, state_parallel)
+                get_action_time += time.clock()-get_action_start_time
+
                 #print "got action"
                 obs_n_parallel = [None] * FLAGS.parallel_episodes
                 state_n_parallel = [None] * FLAGS.parallel_episodes
@@ -108,7 +115,12 @@ class Trainer(object):
 
                 while parallel_episode_no <=FLAGS.parallel_episodes:
                     if episode_done_parallel[parallel_episode_no-1]==False:
+                        env_step_start_time = time.clock()
                         obs_n, reward, done, info = self._env[parallel_episode_no-1].step(action_parallel[parallel_episode_no-1])
+                        env_parallel_step_time+= time.clock()-env_step_start_time
+
+                        train_func_call_start_time = time.clock()
+
                         obs_n_parallel[parallel_episode_no-1]=obs_n
                         #obs_n_parallel.append(obs_n)
                         reward_parallel[parallel_episode_no-1]=reward
@@ -118,6 +130,7 @@ class Trainer(object):
                         #state_n_parallel.append(state_n)
                         done_single = sum(done) >0
                         done_single_parallel[parallel_episode_no-1]=(done_single)
+
                         self.train_agents(state_parallel[parallel_episode_no-1],
                                           action_parallel[parallel_episode_no-1],
                                           reward, state_n, done_single)
@@ -134,6 +147,10 @@ class Trainer(object):
                             #print "TRAINING TIME for ", episode, " no: training episode ", (
                             #    step), "done training steps  (sec)", time.clock() - start_time
                             episode_done_parallel[parallel_episode_no - 1] = is_episode_done(done, step)
+
+                        train_func_call_time += time.clock()-train_func_call_start_time
+
+
                     episode += 1
                     parallel_episode_no += 1
 
@@ -144,15 +161,20 @@ class Trainer(object):
                 step += FLAGS.parallel_episodes
 
                 if episode % 1 == 0:
-                    update_network_time = time.clock()
+                    update_network_start_time = time.clock()
                     self._agent.update_network()
-                    #print "update_network start time ", update_network_time, "total time", time.clock() - update_network_time
+                    update_network_time += time.clock()-update_network_start_time
+
+            print "total episode time ",time.clock()-start_time
+            print "environment stepping time ",env_parallel_step_time
+            print "getting action time ",get_action_time
+            print "train function call time ",train_func_call_time
+            print "update_network time ", update_network_time
 
             episode = episode_start + FLAGS.parallel_episodes
 
 
             self.test_parallel(episode)
-
 
             # parallelizing episodes end
         self._eval.summarize()
@@ -168,6 +190,14 @@ class Trainer(object):
         count = 1
         while step < training_step:
 
+            start_time = time.clock()
+
+            env_parallel_step_time =0
+            get_action_time=0
+            train_func_call_time = 0
+            update_network_time = 0
+
+
             episode += 1
             ep_step = 0
             obs = self._env.reset()
@@ -180,17 +210,25 @@ class Trainer(object):
             while True:
                 step += 1
                 ep_step += 1
-                get_action_time = time.clock()
+
+                get_action_start_time = time.clock()
                 action = self.get_action(obs, step, state)
+                get_action_time += time.clock()-get_action_start_time
+
+
                 #get_action takes 0.003 seconds for each step
-                #print "get_action start time ",get_action_time, "total time", time.clock()-get_action_time
+
+                env_step_start_time = time.clock()
                 obs_n, reward, done, info = self._env.step(action)
+                env_parallel_step_time += time.clock() - env_step_start_time
+
                 state_n = self._env.get_full_encoding()[:, :, 2]
                 done_single = sum(done) > 0
 
-                train_agents_time = time.clock()
+                train_func_call_start_time = time.clock()
                 self.train_agents(state, action, reward, state_n, done_single)
-                #print "train_agents start time ",train_agents_time, "total time", time.clock()-train_agents_time
+                train_func_call_time += time.clock() - train_func_call_start_time
+
                 obs = obs_n
                 state = state_n
                 total_reward += np.sum(reward)
@@ -209,10 +247,17 @@ class Trainer(object):
 
 
             #update network only once per 10 episodes
+            update_network_start_time = time.clock()
             if episode%1 ==0:
-                update_network_time = time.clock()
                 self._agent.update_network()
-                print "update_network start time ", update_network_time, "total time", time.clock() - update_network_time
+            update_network_time += time.clock() - update_network_start_time
+
+            print "total episode time ",time.clock()-start_time
+            print "environment stepping time ",env_parallel_step_time
+            print "getting action time ",get_action_time
+            print "train function call time ",train_func_call_time
+            print "update_network time ", update_network_time
+
 
             if episode % FLAGS.eval_step == 0:
                 self.test(episode)
@@ -286,48 +331,6 @@ class Trainer(object):
 
         return action_n_parallel
 
-        #stp = self.sess.run(self.tp, feed_dict={self.s_in: [data[3] for data in minibatch]})
-        '''
-        action_list = self._agent.act(state)
-
-        def act(self, state):
-    
-            predator_rand = np.random.permutation(FLAGS.n_predator)
-            prey_rand = np.random.permutation(FLAGS.n_prey)      
-    
-            s = self.state_to_index(state)
-        
-            action = self.q_network.get_action(s[None])[0]
-
-            def get_action(self, state_ph):
-                #return self.sess.run(self.cpu_actor_network, feed_dict={self.s_in: state_ph})
-                #sravan
-                return self.sess.run(self.actor_network, feed_dict={self.s_in: state_ph})
-        
-        
-            return action
-        
-        
-
-        for i in range(self._n_predator):
-            #choose a random action if step < FLAGS.m_size * FLAGS.pre_train_step and epsilon greedy
-            if train and (step < FLAGS.m_size * FLAGS.pre_train_step or np.random.rand() < self.epsilon):
-                action = np.random.choice(5)
-                act_n.append(action)
-            else:
-                act_n.append(action_list[i])
-        
-
-
-        # Action of prey
-        for i in range(FLAGS.n_prey):
-            act_n.append(self._prey_agent.act(state, i))
-        # act_n[1] = 2
-        
-
-        return np.array(act_n, dtype=np.int32)
-        '''
-
     def train_agents(self, state, action, reward, state_n, done):
         self._agent.train(state, action, reward, state_n, done)
 
@@ -393,17 +396,19 @@ class Trainer(object):
                         done_single = sum(done) >0
                         done_single_parallel[parallel_episode_no-1]=(done_single)
 
-                        '''parallelize canvas here
-                        state_next = state_to_index(state_n)
-                        if FLAGS.gui:
-                            self.canvas.draw(state_next, done, "Score:" + str(total_reward) + ", Step:" + str(ep_step))
-                        '''
 
                         total_reward[parallel_episode_no-1] += np.sum(reward)
                         if np.sum(reward) >= 0:
                             total_reward_pos[parallel_episode_no-1] += np.sum(reward)
                         else:
                             total_reward_neg[parallel_episode_no-1] += np.sum(reward)
+
+                        if parallel_episode_no==1:
+                            state_next = state_to_index(state_n)
+                            if FLAGS.gui:
+                                self.canvas.draw(state_next, action_parallel[0], "Score:" + str(total_reward[0]) + ", Step:" + str(ep_step))
+
+
                         if is_episode_done(done, step,"test") or ep_step >= FLAGS.max_step:
                             # print step, ep_step, total_reward
                             #print "TESTING TIME for ", episode, "no: test episode ", step, "done testing steps (sec)", time.clock() - start_time

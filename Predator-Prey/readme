@@ -39,3 +39,24 @@ batch size
 https://stackoverflow.com/questions/37044600/sudden-drop-in-accuracy-while-training-a-deep-neural-net
 lower learning rate to avoid sudden drop in score
 
+Timings for nonparallel:
+1 episode:
+0.3 sec for total getting actions
+0.003 sec for one get action
+1 sec for total updating network
+0.01 for one updating network
+measured:
+total episode time  0.383192
+environment stepping time  0.061351
+getting action time  0.228247
+train function call time  0.073685
+update_network time  2.49999999973e-05
+
+
+parallel (parallel episodes =100):
+environment stepping time  4.905384
+getting action time original  4.640967
+train function call time 7.00
+update network time 2.00
+
+22 sec for 100 times updating network

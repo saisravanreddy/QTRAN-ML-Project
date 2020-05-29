@@ -334,3 +334,79 @@
 [INFO|main.py:51] 2020-05-29 07:18:28,060 > [Agent] Agent: pos_cac_fo
 [INFO|trainer.py:43] 2020-05-29 07:18:28,437 > [Agent] Centralized DQN Trainer is created
 [INFO|agent.py:33] 2020-05-29 07:18:28,437 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 07:49:47,197 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 07:49:47,246 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 07:49:47,246 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 08:05:18,773 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 08:05:18,814 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 08:05:18,814 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 08:11:53,688 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 08:11:53,729 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 08:11:53,729 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 08:16:12,548 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 08:16:12,588 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 08:16:12,589 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 10:40:52,979 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 10:40:53,019 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 10:40:53,019 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 11:12:18,532 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 11:12:18,572 > [Agent] Centralized DQN Trainer is created
+[INFO|main.py:53] 2020-05-29 11:14:15,985 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 11:14:16,024 > [Agent] Centralized DQN Trainer is created
+[INFO|main.py:53] 2020-05-29 11:32:36,899 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 11:32:36,939 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 11:32:36,939 > [Agent] Centralized DQN Agent
+[INFO|main.py:53] 2020-05-29 11:36:58,709 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 11:36:58,752 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 11:36:58,752 > [Agent] Centralized DQN Agent
+[INFO|main.py:53] 2020-05-29 11:42:22,603 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 11:42:22,641 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 11:42:22,641 > [Agent] Centralized DQN Agent
+[INFO|main.py:53] 2020-05-29 12:02:22,608 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 12:02:22,650 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 12:02:22,650 > [Agent] Centralized DQN Agent
+[INFO|main.py:53] 2020-05-29 12:04:02,270 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 12:04:02,311 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 12:04:02,311 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 22:44:33,543 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 22:44:34,018 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 22:44:34,018 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 22:48:26,537 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 22:48:26,583 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 22:48:26,583 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 22:49:51,375 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 22:49:51,416 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 22:49:51,417 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 22:52:06,816 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 22:52:06,858 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 22:52:06,859 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 22:55:11,062 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 22:55:11,107 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 22:55:11,107 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 23:05:05,044 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 23:05:05,088 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 23:05:05,088 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 23:10:25,876 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 23:10:25,917 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 23:10:25,918 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 23:15:42,716 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 23:15:42,760 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 23:15:42,761 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-29 23:20:55,308 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-29 23:20:55,350 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-29 23:20:55,350 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-30 00:02:06,152 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-30 00:02:06,199 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-30 00:02:06,199 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-30 00:05:29,978 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-30 00:05:30,024 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-30 00:05:30,024 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-30 00:08:44,617 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-30 00:08:44,659 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-30 00:08:44,659 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-30 00:17:30,075 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-30 00:17:30,119 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-30 00:17:30,119 > [Agent] Centralized DQN Agent
+[INFO|main.py:51] 2020-05-30 00:19:47,790 > [Agent] Agent: pos_cac_fo
+[INFO|trainer.py:43] 2020-05-30 00:19:47,841 > [Agent] Centralized DQN Trainer is created
+[INFO|agent.py:33] 2020-05-30 00:19:47,842 > [Agent] Centralized DQN Agent

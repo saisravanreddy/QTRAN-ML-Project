@@ -20,7 +20,7 @@ ORANGE = (255, 100, 0, 128)
 RED = (255, 0, 0)
 GREEN = (0, 153, 76, 128)
 
-edge_len_pix = 960 # This is the length of each edge in pixels
+edge_len_pix = 700 #960 # This is the length of each edge in pixels
 # Note that we only consider square maps, which will be drawn on square PyGame surfaces
 
 # # Toy parameters (not yet discretized into the grid-world setting)
